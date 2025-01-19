@@ -25,34 +25,65 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
-
+    /**
+     * Retrieves a list of projects.
+     *
+     * @return a list of ProjectResponseDto, with HTTP status 200 OK
+     */
     @GetMapping
     public List<ProjectResponseDto> findAllProjects() {
-        log.info("Get all projects");
+        log.info("Found all projects");
         return projectService.getAllProjects();
     }
+
+    /**
+     * Retrieves a specific project by its ID.
+     *
+     * @param id the ID of the project
+     * @return a ResponseEntity containing the finding ProjectResponseDto, with HTTP status 200 OK
+     *               or HTTP status 404 NOT FOUND if the project is not found
+     */
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> findProjectById(@PathVariable Long id) {
         return ResponseEntity.ok(projectService.getProjectById(id));
     }
 
+    /**
+     * Creates a new project.
+     *
+     * @param request the request body containing the project data
+     * @return a ResponseEntity containing the created ProjectResponseDto, with HTTP status 201 CREATED
+     */
     @PostMapping
     public ResponseEntity<ProjectResponseDto> createProject(@Valid @RequestBody ProjectRequestDto request) {
-        log.info("Project was created{}", request);
+        log.info("The project was created {}", request);
         return ResponseEntity.ok(projectService.createProject(request));
     }
 
+    /**
+     * Updates an existing project.
+     *
+     * @param id the ID of the project to update
+     * @param request the request body containing the project data
+     * @return a ResponseEntity containing the updated ProjectResponseDto, with HTTP status 200 OK
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id,
                                                             @Valid @RequestBody ProjectRequestDto request) {
-        log.info("Project was updated{}", request);
+        log.info("The project was updated {}", request);
         return ResponseEntity.ok(projectService.updateProject(id, request));
     }
 
+    /**
+     * Deletes a specific project.
+     *
+     * @param id the ID of the project to delete
+     * @return a ResponseEntity with HTTP status 204 NO CONTENT if the project is deleted successfully
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
-        log.info("Project was deleted{}", id);
+        log.info("Was deleted the project with Id {}", id);
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
