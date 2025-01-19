@@ -77,7 +77,7 @@ The application will now be accessible at `http://localhost:8080`.
 ### Vacancies
 - `GET /vacancies/{projectId}` - Get all vacancies for a project.
 - `POST /vacancies/{projectId}` - Create a vacancy for a project.
-- `PUT /vacancies//{vacancyId}` - Update a vacancy.
+- `PUT /vacancies/{vacancyId}` - Update a vacancy.
 - `DELETE /vacancies//{vacancyId}` - Delete a vacancy.
 
 ## Testing the Application
