@@ -10,8 +10,6 @@ import isaeva.TroodProjectsApp.model.Vacancy;
 import isaeva.TroodProjectsApp.repository.ProjectRepository;
 import isaeva.TroodProjectsApp.repository.VacancyRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,15 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VacancyService {
 
-    private static final Logger log = LoggerFactory.getLogger(VacancyService.class);
     private final VacancyRepository vacancyRepository;
     private final ProjectRepository projectRepository;
     private final VacancyMapper vacancyMapper;
 
     public List<VacancyResponseDto> getVacanciesByProjectId(Long projectId) {
-        if (!projectRepository.existsById(projectId)) {
+        if (projectRepository.findById(projectId).isEmpty())
             throw new ProjectNotFoundException("Project with id " + projectId + " not found");
-        }
         return vacancyRepository.findByProjectId(projectId).stream()
                 .map(vacancyMapper::toResponse)
                 .toList();
@@ -36,7 +32,7 @@ public class VacancyService {
 
     public VacancyResponseDto createVacancy(Long projectId, VacancyRequestDto request) {
         Project project = projectRepository.findById(projectId).
-                orElseThrow(() ->  new ProjectNotFoundException("Project with id " + projectId + " not found"));
+                orElseThrow(() -> new ProjectNotFoundException("Project with id " + projectId + " not found"));
 
         Vacancy vacancy = vacancyMapper.toEntity(request);
         vacancy.setProject(project);

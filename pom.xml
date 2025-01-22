@@ -76,14 +76,18 @@
             <version>5.15.2</version>
             <scope>test</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>5.15.2</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.13</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -139,6 +143,7 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.15.2/mockito-core-5.15.2.jar</argLine>
+                    <argLine>-Djava.util.logging.ConsoleHandler.level=OFF</argLine>
                 </configuration>
             </plugin>
         </plugins>

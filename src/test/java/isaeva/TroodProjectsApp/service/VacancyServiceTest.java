@@ -61,14 +61,14 @@ class VacancyServiceTest {
     @Test
     void testGetVacanciesByProjectId_Success() {
 
-        when(projectRepository.existsById(1L)).thenReturn(true);
+        when(projectRepository.findById(1L)).thenReturn(Optional.ofNullable(project));
         when(vacancyRepository.findByProjectId(1L)).thenReturn(List.of(vacancy));
         when(vacancyMapper.toResponse(vacancy)).thenReturn(vacancyResponseDto);
 
         List<VacancyResponseDto> result = vacancyService.getVacanciesByProjectId(1L);
 
         assertEquals(1, result.size());
-        assertEquals("Test Vacancy", result.get(0).title());
+        assertEquals("Test Vacancy", result.getFirst().title());
         verify(vacancyRepository, times(1)).findByProjectId(1L);
         verify(vacancyMapper, times(1)).toResponse(vacancy);
     }
@@ -78,9 +78,8 @@ class VacancyServiceTest {
 
         when(projectRepository.existsById(1L)).thenReturn(false);
 
-        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {
-            vacancyService.getVacanciesByProjectId(1L);
-        });
+        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () ->
+                vacancyService.getVacanciesByProjectId(1L));
         assertEquals("Project with id 1 not found", exception.getMessage());
     }
 
@@ -105,9 +104,8 @@ class VacancyServiceTest {
 
         when(projectRepository.findById(1L)).thenReturn(Optional.empty());
 
-        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {
-            vacancyService.createVacancy(1L, vacancyRequestDto);
-        });
+        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () ->
+                vacancyService.createVacancy(1L, vacancyRequestDto));
         assertEquals("Project with id 1 not found", exception.getMessage());
     }
 
@@ -141,9 +139,8 @@ class VacancyServiceTest {
         VacancyRequestDto updateRequest = new VacancyRequestDto("Updated Vacancy", "Updated Description");
         when(vacancyRepository.findById(1L)).thenReturn(Optional.empty());
 
-        VacancyNotFoundException exception = assertThrows(VacancyNotFoundException.class, () -> {
-            vacancyService.updateVacancy(1L, updateRequest);
-        });
+        VacancyNotFoundException exception = assertThrows(VacancyNotFoundException.class, () ->
+                vacancyService.updateVacancy(1L, updateRequest));
         assertEquals("Vacancy with id 1 not found", exception.getMessage());
     }
 
@@ -162,9 +159,8 @@ class VacancyServiceTest {
 
         when(vacancyRepository.findById(1L)).thenReturn(Optional.empty());
 
-        VacancyNotFoundException exception = assertThrows(VacancyNotFoundException.class, () -> {
-            vacancyService.deleteVacancy(1L);
-        });
+        VacancyNotFoundException exception = assertThrows(VacancyNotFoundException.class, () ->
+                vacancyService.deleteVacancy(1L));
         assertEquals("Vacancy with id 1 not found", exception.getMessage());
     }
 }
