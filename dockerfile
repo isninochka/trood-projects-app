@@ -12,3 +12,5 @@ EXPOSE 8080
 
 # Set the command to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+CMD ["java", "-XX:+UnlockDiagnosticVMOptions", "-XX:+AllowAppendBootClassPath", "-jar", "trood-projects-app.jar"]
