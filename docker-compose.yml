@@ -1,6 +1,20 @@
 
 version: '3.8'
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app-container
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/troodprojects
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:15
     container_name: postgres-container
@@ -16,3 +30,22 @@ services:
 
 volumes:
   postgres_data:
+
+#
+#version: '3.8'
+#services:
+#  postgres:
+#    image: postgres:15
+#    container_name: postgres-container
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: admin
+#      POSTGRES_DB: troodprojects
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    restart: always
+#
+#volumes:
+#  postgres_data:
