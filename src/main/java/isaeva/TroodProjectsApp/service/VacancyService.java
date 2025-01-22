@@ -36,10 +36,7 @@ public class VacancyService {
 
     public VacancyResponseDto createVacancy(Long projectId, VacancyRequestDto request) {
         Project project = projectRepository.findById(projectId).
-                orElseThrow(() -> {
-                    log.error("Project with id {} not found", projectId);
-                    return new ProjectNotFoundException("Project with id " + projectId + " not found");
-                });
+                orElseThrow(() ->  new ProjectNotFoundException("Project with id " + projectId + " not found"));
 
         Vacancy vacancy = vacancyMapper.toEntity(request);
         vacancy.setProject(project);
