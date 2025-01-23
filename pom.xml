@@ -121,7 +121,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.plugin.version}</version>
                 <configuration>
-                    <argLine>-Xshare:off</argLine>
+                    <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.15.2/mockito-core-5.15.2.jar
+                        -Xshare:off
+                    </argLine>
                 </configuration>
             </plugin>
           </plugins>
