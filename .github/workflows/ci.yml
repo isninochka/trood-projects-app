@@ -37,9 +37,12 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      # 5. Run tests
-      - name: Run tests
-        run: mvn test
+      # 5. Deploy to GitHub Packages
+      - name: Deploy to GitHub Packages
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn deploy -DskipTests
 
       # 6. Build Docker image
       - name: Build Docker image
