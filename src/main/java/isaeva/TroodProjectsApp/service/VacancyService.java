@@ -1,7 +1,6 @@
 package isaeva.TroodProjectsApp.service;
 
-import isaeva.TroodProjectsApp.dto.VacancyRequestDto;
-import isaeva.TroodProjectsApp.dto.VacancyResponseDto;
+import isaeva.TroodProjectsApp.dto.VacancyDto;
 import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.exception.VacancyNotFoundException;
 import isaeva.TroodProjectsApp.mapper.VacancyMapper;
@@ -22,7 +21,7 @@ public class VacancyService {
     private final ProjectRepository projectRepository;
     private final VacancyMapper vacancyMapper;
 
-    public List<VacancyResponseDto> getVacanciesByProjectId(Long projectId) {
+    public List<VacancyDto> getVacanciesByProjectId(Long projectId) {
         if (projectRepository.findById(projectId).isEmpty())
             throw new ProjectNotFoundException("Project with id " + projectId + " not found");
         return vacancyRepository.findByProjectId(projectId).stream()
@@ -30,7 +29,7 @@ public class VacancyService {
                 .toList();
     }
 
-    public VacancyResponseDto createVacancy(Long projectId, VacancyRequestDto request) {
+    public VacancyDto createVacancy(Long projectId, VacancyRequestDto request) {
         Project project = projectRepository.findById(projectId).
                 orElseThrow(() -> new ProjectNotFoundException("Project with id " + projectId + " not found"));
 
@@ -40,7 +39,7 @@ public class VacancyService {
         return vacancyMapper.toResponse(savedVacancy);
     }
 
-    public VacancyResponseDto updateVacancy(Long id, VacancyRequestDto request) {
+    public VacancyDto updateVacancy(Long id, VacancyRequestDto request) {
 
         Vacancy existingVacancy = vacancyRepository.findById(id).
                 orElseThrow(() -> new VacancyNotFoundException("Vacancy with id " + id + " not found"));

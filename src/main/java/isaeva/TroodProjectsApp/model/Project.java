@@ -1,6 +1,7 @@
 package isaeva.TroodProjectsApp.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -31,22 +33,19 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(nullable = false)
     private String name;
-    @NotBlank
+
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @OneToMany(mappedBy = "project",
             cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
             orphanRemoval = true)
-    private List<Vacancy> vacancies;
+    private List<Vacancy> vacancies = new ArrayList<>();
 
-    public Project(String name, String description, List<Vacancy> vacancies) {
+    public Project(String name, String description) {
         this.name = name;
         this.description = description;
-        this.vacancies =vacancies;
     }
-
-
 }

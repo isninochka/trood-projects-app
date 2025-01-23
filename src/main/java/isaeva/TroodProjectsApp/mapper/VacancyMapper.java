@@ -1,8 +1,9 @@
 package isaeva.TroodProjectsApp.mapper;
 
-import isaeva.TroodProjectsApp.dto.VacancyRequestDto;
-import isaeva.TroodProjectsApp.dto.VacancyResponseDto;
+import isaeva.TroodProjectsApp.dto.VacancyDto;
+import isaeva.TroodProjectsApp.model.Project;
 import isaeva.TroodProjectsApp.model.Vacancy;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -10,17 +11,14 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", uses = ProjectMapper.class)
 public interface VacancyMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "project", ignore = true)
-    Vacancy toEntity(VacancyRequestDto request);
+    @Mapping(source = "project.id", target = "projectId")
+    VacancyDto toDto(Vacancy vacancy);
 
-    VacancyResponseDto toResponse(Vacancy vacancy);
+    VacancyDto toResponse(Vacancy vacancy);
 
-    List<VacancyResponseDto> toList(List<Vacancy> vacancies);
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "project", ignore = true)
-    void updateFromRequest(VacancyRequestDto request, @MappingTarget Vacancy vacancy);
+    @Mapping(source = "projectId", target = "project")
+    Vacancy toEntity(VacancyDto vacancyDto, @Context Project project);
 }

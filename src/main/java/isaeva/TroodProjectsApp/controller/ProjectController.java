@@ -1,7 +1,6 @@
 package isaeva.TroodProjectsApp.controller;
 
-import isaeva.TroodProjectsApp.dto.ProjectRequestDto;
-import isaeva.TroodProjectsApp.dto.ProjectResponseDto;
+import isaeva.TroodProjectsApp.dto.ProjectDto;
 import isaeva.TroodProjectsApp.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +55,7 @@ public class ProjectController {
      * @return a ResponseEntity containing the created ProjectResponseDto, with HTTP status 201 CREATED
      */
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@Valid @RequestBody ProjectRequestDto request) {
+    public ResponseEntity<ProjectResponseDto> createProject(@Valid @RequestBody ProjectDto request) {
         log.info("The project was created {}", request);
         return ResponseEntity.ok(projectService.createProject(request));
     }
@@ -70,7 +69,7 @@ public class ProjectController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id,
-                                                            @Valid @RequestBody ProjectRequestDto request) {
+                                                            @Valid @RequestBody ProjectDto request) {
         log.info("The project was updated {}", request);
         return ResponseEntity.ok(projectService.updateProject(id, request));
     }

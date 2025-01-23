@@ -1,7 +1,6 @@
 package isaeva.TroodProjectsApp.service;
 
-import isaeva.TroodProjectsApp.dto.ProjectRequestDto;
-import isaeva.TroodProjectsApp.dto.ProjectResponseDto;
+import isaeva.TroodProjectsApp.dto.ProjectDto;
 import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.mapper.ProjectMapper;
 import isaeva.TroodProjectsApp.model.Project;
@@ -9,6 +8,7 @@ import isaeva.TroodProjectsApp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,14 +30,14 @@ public class ProjectService {
         return projectMapper.toResponse(project);
     }
 
-    public ProjectResponseDto createProject(ProjectRequestDto request) {
+    public ProjectResponseDto createProject(ProjectDto request) {
         Project project = projectMapper.toEntity(request);
-        project.setVacancies(List.of());
+        project.setVacancies(new ArrayList<>());
         Project savedProject = projectRepository.save(project);
         return projectMapper.toResponse(savedProject);
     }
 
-    public ProjectResponseDto updateProject(Long id, ProjectRequestDto request) {
+    public ProjectResponseDto updateProject(Long id, ProjectDto request) {
 
         Project existingProject = projectRepository.findById(id).
                 orElseThrow(() -> new ProjectNotFoundException("Project with id " + id + " not found"));

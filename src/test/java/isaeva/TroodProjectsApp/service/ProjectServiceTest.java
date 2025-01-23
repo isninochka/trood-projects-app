@@ -1,7 +1,6 @@
 package isaeva.TroodProjectsApp.service;
 
-import isaeva.TroodProjectsApp.dto.ProjectRequestDto;
-import isaeva.TroodProjectsApp.dto.ProjectResponseDto;
+import isaeva.TroodProjectsApp.dto.ProjectDto;
 import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.mapper.ProjectMapper;
 import isaeva.TroodProjectsApp.model.Project;
@@ -12,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
+@SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 class ProjectServiceTest {
 
@@ -38,15 +40,15 @@ class ProjectServiceTest {
     private ProjectService projectService;
 
     private Project project;
-    private ProjectRequestDto projectRequestDto;
-    private ProjectResponseDto projectResponseDto;
+
+    private ProjectDto projectResponseDto;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
         project = new Project(1L, "Test Project", "Test Description", new ArrayList<>());
-        projectRequestDto = new ProjectRequestDto("Test Project", "Test Description");
+        projectRequestDto = new ProjectDto("Test Project", "Test Description");
         projectResponseDto = new ProjectResponseDto(1L, "Test Project", "Test Description",
                 new ArrayList<>());
 
@@ -55,7 +57,8 @@ class ProjectServiceTest {
     @Test
     void testGetAllProjects() {
 
-        List<Project> projects = List.of(project);
+        List<Project> projects = new ArrayList<>();
+        projects.add(project);
         when(projectRepository.findAll()).thenReturn(projects);
         when(projectMapper.toResponse(project)).thenReturn(projectResponseDto);
 
@@ -111,7 +114,7 @@ class ProjectServiceTest {
     @Test
     void testUpdateProject_Success() {
 
-        ProjectRequestDto updateRequest = new ProjectRequestDto("Updated Project", "Updated Description");
+        ProjectDto updateRequest = new ProjectDto("Updated Project", "Updated Description");
         Project existingProject = new Project(1L, "Updated Project", "Updated Description", new ArrayList<>());
         Project updatedProject = new Project(1L, "Updated Project", "Updated Description", new ArrayList<>());
         ProjectResponseDto updatedResponse = new ProjectResponseDto(1L, "Updated Project", "Updated Description", new ArrayList<>());
@@ -137,7 +140,7 @@ class ProjectServiceTest {
     @Test
     void testUpdateProject_NotFound() {
 
-        ProjectRequestDto updateRequest = new ProjectRequestDto("Updated Project", "Updated Description");
+        ProjectDto updateRequest = new ProjectDto("Updated Project", "Updated Description");
         when(projectRepository.findById(1L)).thenReturn(Optional.empty());
 
         ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {

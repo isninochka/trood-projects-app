@@ -1,7 +1,7 @@
 package isaeva.TroodProjectsApp.service;
 
-import isaeva.TroodProjectsApp.dto.VacancyRequestDto;
-import isaeva.TroodProjectsApp.dto.VacancyResponseDto;
+import isaeva.TroodProjectsApp.TroodProjectsAppApplication;
+import isaeva.TroodProjectsApp.dto.VacancyDto;
 import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.exception.VacancyNotFoundException;
 import isaeva.TroodProjectsApp.mapper.VacancyMapper;
@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @AutoConfigureMockMvc
-class VacancyServiceTest {
 
+@SpringBootTest(classes = TroodProjectsAppApplication.class)
+
+class VacancyServiceTest {
 
     @Mock
     private VacancyRepository vacancyRepository;
@@ -46,7 +50,7 @@ class VacancyServiceTest {
     private Project project;
     private Vacancy vacancy;
     private VacancyRequestDto vacancyRequestDto;
-    private VacancyResponseDto vacancyResponseDto;
+    private VacancyDto vacancyResponseDto;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +59,7 @@ class VacancyServiceTest {
         project = new Project(1L, "Test Project", "Test Description", new ArrayList<>());
         vacancy = new Vacancy(1L, "Test Vacancy", "Description", project);
         vacancyRequestDto = new VacancyRequestDto("Test Vacancy", "Description");
-        vacancyResponseDto = new VacancyResponseDto(1L, "Test Vacancy", "Description");
+        vacancyResponseDto = new VacancyDto(1L, "Test Vacancy", "Description");
     }
 
     @Test
@@ -65,7 +69,7 @@ class VacancyServiceTest {
         when(vacancyRepository.findByProjectId(1L)).thenReturn(List.of(vacancy));
         when(vacancyMapper.toResponse(vacancy)).thenReturn(vacancyResponseDto);
 
-        List<VacancyResponseDto> result = vacancyService.getVacanciesByProjectId(1L);
+        List<VacancyDto> result = vacancyService.getVacanciesByProjectId(1L);
 
         assertEquals(1, result.size());
         assertEquals("Test Vacancy", result.getFirst().title());
@@ -91,7 +95,7 @@ class VacancyServiceTest {
         when(vacancyRepository.save(vacancy)).thenReturn(vacancy);
         when(vacancyMapper.toResponse(vacancy)).thenReturn(vacancyResponseDto);
 
-        VacancyResponseDto result = vacancyService.createVacancy(1L, vacancyRequestDto);
+        VacancyDto result = vacancyService.createVacancy(1L, vacancyRequestDto);
 
         assertNotNull(result);
         assertEquals("Test Vacancy", result.title());
@@ -115,13 +119,13 @@ class VacancyServiceTest {
         VacancyRequestDto updateRequest = new VacancyRequestDto("Updated Vacancy", "Updated Description");
         Vacancy vacancy = new Vacancy(1L, "Old Vacancy", "Old Description", project);
         Vacancy updatedVacancy = new Vacancy(1L, "Updated Vacancy", "Updated Description", project);
-        VacancyResponseDto vacancyResponseDto = new VacancyResponseDto(1L, "Updated Vacancy", "Updated Description");
+        VacancyDto vacancyResponseDto = new VacancyDto(1L, "Updated Vacancy", "Updated Description");
 
         when(vacancyRepository.findById(1L)).thenReturn(Optional.of(vacancy));
         when(vacancyMapper.toResponse(updatedVacancy)).thenReturn(vacancyResponseDto);
         when(vacancyRepository.save(vacancy)).thenReturn(updatedVacancy);
 
-        VacancyResponseDto result = vacancyService.updateVacancy(1L, updateRequest);
+        VacancyDto result = vacancyService.updateVacancy(1L, updateRequest);
 
         assertNotNull(result);
         assertEquals("Updated Vacancy", result.title());
