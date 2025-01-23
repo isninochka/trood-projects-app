@@ -75,11 +75,7 @@
             <version>5.15.2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>maven-surefire-common</artifactId>
-            <version>3.0.0-M4</version>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -125,9 +121,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.plugin.version}</version>
                 <configuration>
-                    <argLine>-javaagent:${settings.localRepository}/org/mockito/mockito-core/5.15.2/mockito-core-5.15.2.jar
-                        -Xshare:off
-                    </argLine>
+                    <argLine>-Xshare:off</argLine>
                 </configuration>
             </plugin>
           </plugins>
