@@ -41,11 +41,17 @@ jobs:
       - name: Deploy to GitHub Packages
         env:
           GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn deploy -DskipTests
 
       - name: Debug Maven Deploy
         run: mvn clean deploy -X
+
+      - name: Test GitHub API with token
+        run: curl -u "$GITHUB_ACTOR:$GITHUB_TOKEN" https://api.github.com/user
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
       # 6. Build Docker image
