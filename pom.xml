@@ -10,7 +10,7 @@
     </parent>
     <groupId>isaeva</groupId>
     <artifactId>trood-projects-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>trood-projects-app</name>
     <description>trood-projects-app</description>
 
