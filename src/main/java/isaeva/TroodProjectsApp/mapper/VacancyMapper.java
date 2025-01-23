@@ -12,12 +12,11 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = ProjectMapper.class)
 public interface VacancyMapper {
 
-    @Mapping(source = "project.id", target = "projectId")
+    @Mapping(ignore = true, target = "projectId")
     VacancyDto toDto(Vacancy vacancy);
 
-    VacancyDto toResponse(Vacancy vacancy);
-
-    @Mapping(source = "projectId", target = "project")
+    @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "project")
     Vacancy toEntity(VacancyDto vacancyDto, @Context Project project);
 
     List<VacancyDto> toListDto(List<Vacancy> vacancyList);

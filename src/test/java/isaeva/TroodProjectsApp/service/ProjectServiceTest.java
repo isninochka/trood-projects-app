@@ -5,168 +5,159 @@ import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.mapper.ProjectMapper;
 import isaeva.TroodProjectsApp.model.Project;
 import isaeva.TroodProjectsApp.repository.ProjectRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@AutoConfigureMockMvc
+
+@ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
 
-    @Mock
+    @Mock // Мокируем зависимости
     private ProjectRepository projectRepository;
 
     @Mock
     private ProjectMapper projectMapper;
 
-    @InjectMocks
+    @InjectMocks // Внедряем моки в тестируемый класс
     private ProjectService projectService;
 
-    private Project project;
+    @Test
+    void getAllProjects_shouldReturnListOfProjects() {
+        // Arrange
+        List<Project> projects = List.of(
+                new Project(1L, "Project 1", "Description 1"),
+                new Project(2L, "Project 2", "Description 2")
+        );
+        List<ProjectDto> projectDtos = List.of(
+                new ProjectDto("Project 1", "Description 1"),
+                new ProjectDto("Project 2", "Description 2")
+        );
 
-    private ProjectDto projectResponseDto;
+        Mockito.when(projectRepository.findAll()).thenReturn(projects);
+        Mockito.when(projectMapper.toListDto(projects)).thenReturn(projectDtos);
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // Act
+        List<ProjectDto> result = projectService.getAllProjects();
 
-        project = new Project(1L, "Test Project", "Test Description", new ArrayList<>());
-        projectRequestDto = new ProjectDto("Test Project", "Test Description");
-        projectResponseDto = new ProjectResponseDto(1L, "Test Project", "Test Description",
-                new ArrayList<>());
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Project 1", result.getFirst().name());
+        assertEquals("Description 1", result.getFirst().description());
 
+        Mockito.verify(projectRepository).findAll();
+        Mockito.verify(projectMapper).toListDto(projects);
     }
 
     @Test
-    void testGetAllProjects() {
+    void getProjectById_shouldReturnProjectDto() {
+        // Arrange
+        Project project = new Project(1L, "Project 1", "Description 1");
+        ProjectDto projectDto = new ProjectDto("Project 1", "Description 1");
 
-        List<Project> projects = new ArrayList<>();
-        projects.add(project);
-        when(projectRepository.findAll()).thenReturn(projects);
-        when(projectMapper.toResponse(project)).thenReturn(projectResponseDto);
+        Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
+        Mockito.when(projectMapper.toDto(project)).thenReturn(projectDto);
 
-        List<ProjectResponseDto> result = projectService.getAllProjects();
+        // Act
+        ProjectDto result = projectService.getProjectById(1L);
 
-        assertEquals(1, result.size());
-        assertEquals("Test Project", result.get(0).name());
-        verify(projectRepository, times(1)).findAll();
-        verify(projectMapper, times(1)).toResponse(project);
+        // Assert
+        assertEquals("Project 1", result.name());
+        assertEquals("Description 1", result.description());
+
+        Mockito.verify(projectRepository).findById(1L);
+        Mockito.verify(projectMapper).toDto(project);
     }
 
     @Test
-    void testGetProjectById_Success() {
+    void getProjectById_shouldThrowExceptionWhenNotFound() {
+        // Arrange
+        Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.empty());
 
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-        when(projectMapper.toResponse(project)).thenReturn(projectResponseDto);
+        // Act & Assert
+        assertThrows(ProjectNotFoundException.class, () -> projectService.getProjectById(1L));
 
-        ProjectResponseDto result = projectService.getProjectById(1L);
-
-        assertNotNull(result);
-        assertEquals("Test Project", result.name());
-        verify(projectRepository, times(1)).findById(1L);
-        verify(projectMapper, times(1)).toResponse(project);
+        Mockito.verify(projectRepository).findById(1L);
     }
 
     @Test
-    void testGetProjectById_NotFound() {
+    void createProject_shouldSaveAndReturnProjectDto() {
+        // Arrange
+        ProjectDto request = new ProjectDto("New Project", "New Description");
+        Project project = new Project(null, "New Project", "New Description");
+        Project savedProject = new Project(1L, "New Project", "New Description");
+        ProjectDto response = new ProjectDto("New Project", "New Description");
 
-        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
+        Mockito.when(projectMapper.toEntity(request)).thenReturn(project);
+        Mockito.when(projectRepository.save(project)).thenReturn(savedProject);
+        Mockito.when(projectMapper.toDto(savedProject)).thenReturn(response);
 
-        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {
-            projectService.getProjectById(1L);
-        });
-        assertEquals("Project with id 1 not found", exception.getMessage());
+        // Act
+        ProjectDto result = projectService.createProject(request);
+
+        // Assert
+        assertEquals("New Project", result.name());
+        assertEquals("New Description", result.description());
+
+        Mockito.verify(projectMapper).toEntity(request);
+        Mockito.verify(projectRepository).save(project);
+        Mockito.verify(projectMapper).toDto(savedProject);
     }
 
     @Test
-    void testCreateProject() {
+    void updateProject_shouldUpdateAndReturnProjectDto() {
+        // Arrange
+        ProjectDto request = new ProjectDto("Updated Project", "Updated Description");
+        Project existingProject = new Project(1L, "Old Project", "Old Description");
+        Project updatedProject = new Project(1L, "Updated Project", "Updated Description");
+        ProjectDto response = new ProjectDto("Updated Project", "Updated Description");
 
-        when(projectMapper.toEntity(projectRequestDto)).thenReturn(project);
-        when(projectRepository.save(project)).thenReturn(project);
-        when(projectMapper.toResponse(project)).thenReturn(projectResponseDto);
+        Mockito.when(projectRepository.findById(1L)).thenReturn(Optional.of(existingProject));
+        Mockito.when(projectRepository.save(existingProject)).thenReturn(updatedProject);
+        Mockito.when(projectMapper.toDto(updatedProject)).thenReturn(response);
 
-        ProjectResponseDto result = projectService.createProject(projectRequestDto);
+        // Act
+        ProjectDto result = projectService.updateProject(1L, request);
 
-        assertNotNull(result);
-        assertEquals("Test Project", result.name());
-        verify(projectMapper, times(1)).toEntity(projectRequestDto);
-        verify(projectRepository, times(1)).save(project);
-        verify(projectMapper, times(1)).toResponse(project);
-    }
-
-    @Test
-    void testUpdateProject_Success() {
-
-        ProjectDto updateRequest = new ProjectDto("Updated Project", "Updated Description");
-        Project existingProject = new Project(1L, "Updated Project", "Updated Description", new ArrayList<>());
-        Project updatedProject = new Project(1L, "Updated Project", "Updated Description", new ArrayList<>());
-        ProjectResponseDto updatedResponse = new ProjectResponseDto(1L, "Updated Project", "Updated Description", new ArrayList<>());
-
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(existingProject));
-        when(projectMapper.toResponse(updatedProject)).thenReturn(updatedResponse);
-        when(projectRepository.save(existingProject)).thenReturn(updatedProject);
-
-        ProjectResponseDto result = projectService.updateProject(1L, updateRequest);
-
-        assertNotNull(result);
+        // Assert
         assertEquals("Updated Project", result.name());
         assertEquals("Updated Description", result.description());
 
-        verify(projectRepository, times(1)).findById(1L);
-        verify(projectMapper, times(1)).updateFromRequest(updateRequest, existingProject);
-        verify(projectRepository, times(1)).save(existingProject);
-        verify(projectMapper, times(1)).toResponse(updatedProject);
-
-
+        Mockito.verify(projectRepository).findById(1L);
+        Mockito.verify(projectRepository).save(existingProject);
+        Mockito.verify(projectMapper).toDto(updatedProject);
     }
 
     @Test
-    void testUpdateProject_NotFound() {
+    void deleteProject_shouldDeleteWhenExists() {
+        // Arrange
+        Mockito.when(projectRepository.existsById(1L)).thenReturn(true);
 
-        ProjectDto updateRequest = new ProjectDto("Updated Project", "Updated Description");
-        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
-
-        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {
-            projectService.updateProject(1L, updateRequest);
-        });
-        assertEquals("Project with id 1 not found", exception.getMessage());
-    }
-
-    @Test
-    void testDeleteProject_Success() {
-
-        when(projectRepository.findById(1L)).thenReturn(Optional.of(project));
-
+        // Act
         projectService.deleteProject(1L);
 
-        verify(projectRepository, times(1)).delete(project);
+        // Assert
+        Mockito.verify(projectRepository).existsById(1L);
+        Mockito.verify(projectRepository).deleteById(1L);
     }
 
     @Test
-    void testDeleteProject_NotFound() {
+    void deleteProject_shouldThrowExceptionWhenNotFound() {
+        // Arrange
+        Mockito.when(projectRepository.existsById(1L)).thenReturn(false);
 
-        when(projectRepository.findById(1L)).thenReturn(Optional.empty());
+        // Act & Assert
+        assertThrows(ProjectNotFoundException.class, () -> projectService.deleteProject(1L));
 
-        ProjectNotFoundException exception = assertThrows(ProjectNotFoundException.class, () -> {
-            projectService.deleteProject(1L);
-        });
-        assertEquals("Project with id 1 not found", exception.getMessage());
+        Mockito.verify(projectRepository).existsById(1L);
     }
 }
