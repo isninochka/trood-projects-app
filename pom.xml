@@ -75,6 +75,11 @@
             <version>5.15.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>maven-surefire-common</artifactId>
+            <version>3.0.0-M4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -125,7 +130,7 @@
                     </argLine>
                 </configuration>
             </plugin>
-        </plugins>
+          </plugins>
     </build>
 
     <distributionManagement>
