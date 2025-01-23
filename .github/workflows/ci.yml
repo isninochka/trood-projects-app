@@ -43,6 +43,9 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn deploy -DskipTests
+      - name: Debug Maven Deploy
+        run: mvn clean deploy -X
+
 
       # 6. Build Docker image
       - name: Build Docker image
