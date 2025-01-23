@@ -1,7 +1,6 @@
 package isaeva.TroodProjectsApp.controller;
 
 import isaeva.TroodProjectsApp.dto.VacancyDto;
-import isaeva.TroodProjectsApp.exception.ProjectNotFoundException;
 import isaeva.TroodProjectsApp.service.VacancyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,42 +34,40 @@ public class VacancyController {
      */
     @GetMapping("/{projectId}")
     public ResponseEntity<List<VacancyDto>> findVacanciesByProjectId(@PathVariable Long projectId) {
+        List<VacancyDto> vacancies = vacancyService.getVacanciesByProjectId(projectId);
         log.info("Found all vacancies with ProjectId {}", projectId);
-        return ResponseEntity.ok(vacancyService.getVacanciesByProjectId(projectId));
+
+        return ResponseEntity.ok(vacancies);
     }
 
     /**
      * Creates a new vacancy for a specific project.
      *
-     * @param projectId the ID of the project to associate with the vacancy
      * @param request the request body containing the vacancy data
      * @return a ResponseEntity containing the created VacancyDto, with HTTP status 201 CREATED
-     *         or HTTP status 404 NOT FOUND if the project is not found
+     * or HTTP status 404 NOT FOUND if the project is not found
      */
-    @PostMapping("/{projectId}")
-    public ResponseEntity<VacancyDto> createVacancy(@PathVariable Long projectId,
-                                                    @Valid @RequestBody VacancyRequestDto request) {
+    @PostMapping
+    public ResponseEntity<VacancyDto> createVacancy(@Valid @RequestBody VacancyDto request) {
+        VacancyDto savedVacancy = vacancyService.createVacancy(request);
         log.info("The vacancy was created {}", request);
-        try {
-            VacancyDto response = vacancyService.createVacancy(projectId, request);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (ProjectNotFoundException ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedVacancy);
     }
 
     /**
      * Updates an existing vacancy.
      *
      * @param vacancyId the ID of the vacancy to update
-     * @param request the request body containing the updated vacancy data
+     * @param request   the request body containing the updated vacancy data
      * @return a ResponseEntity containing the updated VacancyDto, with HTTP status 200 OK
      */
     @PutMapping("/{vacancyId}")
     public ResponseEntity<VacancyDto> updateVacancy(@PathVariable Long vacancyId,
-                                                    @Valid @RequestBody VacancyRequestDto request) {
-        log.info("The vacancy was updated {}", request);
+                                                    @Valid @RequestBody VacancyDto request) {
         VacancyDto updatedVacancy = vacancyService.updateVacancy(vacancyId, request);
+        log.info("The vacancy was updated {}", request);
+
         return ResponseEntity.ok(updatedVacancy);
     }
 

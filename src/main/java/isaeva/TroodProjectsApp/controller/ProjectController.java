@@ -5,6 +5,7 @@ import isaeva.TroodProjectsApp.service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,37 +28,40 @@ public class ProjectController {
     /**
      * Retrieves a list of projects.
      *
-     * @return a list of ProjectResponseDto, with HTTP status 200 OK
+     * @return a list of ProjectDto, with HTTP status 200 OK
      */
     @GetMapping
-    public List<ProjectResponseDto> findAllProjects() {
+    public ResponseEntity<List<ProjectDto>> findAllProjects() {
+        List<ProjectDto> projects = projectService.getAllProjects();
         log.info("Found all projects");
-        return projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
     }
 
     /**
      * Retrieves a specific project by its ID.
      *
      * @param id the ID of the project
-     * @return a ResponseEntity containing the finding ProjectResponseDto, with HTTP status 200 OK
+     * @return a ResponseEntity containing the finding ProjectDto, with HTTP status 200 OK
      *               or HTTP status 404 NOT FOUND if the project is not found
      */
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> findProjectById(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectById(id));
+    public ResponseEntity<ProjectDto> findProjectById(@PathVariable Long id) {
+        ProjectDto project = projectService.getProjectById(id);
+        return ResponseEntity.ok(project);
     }
 
     /**
      * Creates a new project.
      *
      * @param request the request body containing the project data
-     * @return a ResponseEntity containing the created ProjectResponseDto, with HTTP status 201 CREATED
+     * @return a ResponseEntity containing the created ProjectDto, with HTTP status 201 CREATED
      */
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@Valid @RequestBody ProjectDto request) {
+    public ResponseEntity<ProjectDto> createProject(@Valid @RequestBody ProjectDto request) {
+        ProjectDto savedProject = projectService.createProject(request);
         log.info("The project was created {}", request);
-        return ResponseEntity.ok(projectService.createProject(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProject);
     }
 
     /**
@@ -65,13 +69,14 @@ public class ProjectController {
      *
      * @param id the ID of the project to update
      * @param request the request body containing the project data
-     * @return a ResponseEntity containing the updated ProjectResponseDto, with HTTP status 200 OK
+     * @return a ResponseEntity containing the updated ProjectDto, with HTTP status 200 OK
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id,
+    public ResponseEntity<ProjectDto> updateProject(@PathVariable Long id,
                                                             @Valid @RequestBody ProjectDto request) {
+        ProjectDto updatedProject = projectService.updateProject(id,request);
         log.info("The project was updated {}", request);
-        return ResponseEntity.ok(projectService.updateProject(id, request));
+        return ResponseEntity.ok(updatedProject);
     }
 
     /**
