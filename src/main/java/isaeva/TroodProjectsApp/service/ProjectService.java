@@ -8,7 +8,6 @@ import isaeva.TroodProjectsApp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,40 +17,37 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
 
-    public List<ProjectResponseDto> getAllProjects() {
-        return projectRepository.findAll().stream()
-                .map(projectMapper::toResponse)
-                .toList();
+    public List<ProjectDto> getAllProjects() {
+        List<Project> projects = projectRepository.findAll();
+        return projectMapper.toListDto(projects);
     }
 
-    public ProjectResponseDto getProjectById(Long id) {
+    public ProjectDto getProjectById(Long id) {
         Project project = projectRepository.findById(id).
                 orElseThrow(() -> new ProjectNotFoundException("Project with id " + id + " not found"));
-        return projectMapper.toResponse(project);
+        return projectMapper.toDto(project);
     }
 
-    public ProjectResponseDto createProject(ProjectDto request) {
+    public ProjectDto createProject(ProjectDto request) {
         Project project = projectMapper.toEntity(request);
-        project.setVacancies(new ArrayList<>());
-        Project savedProject = projectRepository.save(project);
-        return projectMapper.toResponse(savedProject);
+        return projectMapper.toDto(projectRepository.save(project));
     }
 
-    public ProjectResponseDto updateProject(Long id, ProjectDto request) {
+    public ProjectDto updateProject(Long id, ProjectDto request) {
 
         Project existingProject = projectRepository.findById(id).
                 orElseThrow(() -> new ProjectNotFoundException("Project with id " + id + " not found"));
-        projectMapper.updateFromRequest(request, existingProject);
+        existingProject.setName(request.name());
+        existingProject.setDescription(request.description());
         Project updetedProject = projectRepository.save(existingProject);
 
-        return projectMapper.toResponse(updetedProject);
-
-
+        return projectMapper.toDto(updetedProject);
     }
 
     public void deleteProject(Long id) {
-        Project project = projectRepository.findById(id).
-                orElseThrow(() -> new ProjectNotFoundException("Project with id " + id + " not found"));
-        projectRepository.delete(project);
+        if (!projectRepository.existsById(id)) {
+            throw new ProjectNotFoundException("Project with id " + id + " not found");
+        }
+        projectRepository.deleteById(id);
     }
 }

@@ -22,38 +22,43 @@ public class VacancyService {
     private final VacancyMapper vacancyMapper;
 
     public List<VacancyDto> getVacanciesByProjectId(Long projectId) {
-        if (projectRepository.findById(projectId).isEmpty())
-            throw new ProjectNotFoundException("Project with id " + projectId + " not found");
-        return vacancyRepository.findByProjectId(projectId).stream()
-                .map(vacancyMapper::toResponse)
-                .toList();
+        List<Vacancy> vacancies = vacancyRepository.findByProjectId(projectId);
+
+        return vacancyMapper.toListDto(vacancies);
     }
 
-    public VacancyDto createVacancy(Long projectId, VacancyRequestDto request) {
-        Project project = projectRepository.findById(projectId).
-                orElseThrow(() -> new ProjectNotFoundException("Project with id " + projectId + " not found"));
+    public VacancyDto createVacancy(VacancyDto request) {
+        Project project = projectRepository.findById(request.projectId()).
+                orElseThrow(() -> new ProjectNotFoundException(
+                        "Project with id " + request.projectId() + " not found"));
 
-        Vacancy vacancy = vacancyMapper.toEntity(request);
-        vacancy.setProject(project);
+        Vacancy vacancy = vacancyMapper.toEntity(request, project);
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
-        return vacancyMapper.toResponse(savedVacancy);
+        return vacancyMapper.toDto(savedVacancy);
     }
 
-    public VacancyDto updateVacancy(Long id, VacancyRequestDto request) {
+    public VacancyDto updateVacancy(Long id, VacancyDto request) {
 
         Vacancy existingVacancy = vacancyRepository.findById(id).
                 orElseThrow(() -> new VacancyNotFoundException("Vacancy with id " + id + " not found"));
 
-        vacancyMapper.updateFromRequest(request, existingVacancy);
-        Vacancy updatedVacancy = vacancyRepository.save(existingVacancy);
+        Project project = projectRepository.findById(request.projectId()).
+                orElseThrow(() -> new ProjectNotFoundException("Project with id " + request.projectId() + " not found"));
 
-        return vacancyMapper.toResponse(updatedVacancy);
+        existingVacancy.setTitle(request.title());
+        existingVacancy.setDescription(request.description());
+        existingVacancy.setProject(project);
+
+        Vacancy updatedVacancy = vacancyRepository.save(existingVacancy);
+        return vacancyMapper.toDto(updatedVacancy);
     }
 
     public void deleteVacancy(Long id) {
-        Vacancy vacancy = vacancyRepository.findById(id).
-                orElseThrow(() -> new VacancyNotFoundException("Vacancy with id " + id + " not found"));
-        vacancyRepository.delete(vacancy);
+        if (!vacancyRepository.existsById(id)) {
+            throw new VacancyNotFoundException("Vacancy with id " + id + " not found");
+        }
+
+        vacancyRepository.deleteById(id);
     }
 
 

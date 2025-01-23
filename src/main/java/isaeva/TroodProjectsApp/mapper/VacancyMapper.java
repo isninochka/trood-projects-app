@@ -6,8 +6,6 @@ import isaeva.TroodProjectsApp.model.Vacancy;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -21,4 +19,6 @@ public interface VacancyMapper {
 
     @Mapping(source = "projectId", target = "project")
     Vacancy toEntity(VacancyDto vacancyDto, @Context Project project);
+
+    List<VacancyDto> toListDto(List<Vacancy> vacancyList);
 }
