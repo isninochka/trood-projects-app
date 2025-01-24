@@ -40,7 +40,7 @@ jobs:
       # 5. Deploy to GitHub Packages
       - name: Deploy to GitHub Packages
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
+
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn deploy -DskipTests
 
