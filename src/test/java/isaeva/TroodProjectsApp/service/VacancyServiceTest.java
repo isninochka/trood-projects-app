@@ -52,10 +52,8 @@ class VacancyServiceTest {
         Mockito.when(vacancyRepository.findByProjectId(projectId)).thenReturn(vacancies);
         Mockito.when(vacancyMapper.toListDto(vacancies)).thenReturn(vacancyDtos);
 
-        // Act
         List<VacancyDto> result = vacancyService.getVacanciesByProjectId(projectId);
 
-        // Assert
         assertEquals(2, result.size());
         assertEquals("Vacancy 1", result.getFirst().title());
         assertEquals("Description 1", result.getFirst().description());
@@ -66,7 +64,7 @@ class VacancyServiceTest {
 
     @Test
     void createVacancy_shouldSaveAndReturnVacancyDto() {
-        // Arrange
+
         Long projectId = 1L;
         Project project = new Project(projectId, "Project 1", "Description 1");
         Vacancy vacancy = new Vacancy(null, "New Vacancy", "New Description", project);
@@ -79,10 +77,8 @@ class VacancyServiceTest {
         Mockito.when(vacancyRepository.save(vacancy)).thenReturn(savedVacancy);
         Mockito.when(vacancyMapper.toDto(savedVacancy)).thenReturn(response);
 
-        // Act
         VacancyDto result = vacancyService.createVacancy(request);
 
-        // Assert
         assertEquals("New Vacancy", result.title());
         assertEquals("New Description", result.description());
         assertEquals(projectId, result.projectId());
@@ -95,13 +91,12 @@ class VacancyServiceTest {
 
     @Test
     void createVacancy_shouldThrowExceptionIfProjectNotFound() {
-        // Arrange
+
         Long projectId = 1L;
         VacancyDto request = new VacancyDto("New Vacancy", "New Description", projectId);
 
         Mockito.when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(ProjectNotFoundException.class, () -> vacancyService.createVacancy(request));
 
         Mockito.verify(projectRepository).findById(projectId);
@@ -110,7 +105,7 @@ class VacancyServiceTest {
 
     @Test
     void updateVacancy_shouldUpdateAndReturnVacancyDto() {
-        // Arrange
+
         Long vacancyId = 1L;
         Long projectId = 1L;
         Project project = new Project(projectId, "Project 1", "Description 1");
@@ -124,10 +119,8 @@ class VacancyServiceTest {
         Mockito.when(vacancyRepository.save(existingVacancy)).thenReturn(updatedVacancy);
         Mockito.when(vacancyMapper.toDto(updatedVacancy)).thenReturn(response);
 
-        // Act
         VacancyDto result = vacancyService.updateVacancy(vacancyId, request);
 
-        // Assert
         assertEquals("Updated Vacancy", result.title());
         assertEquals("Updated Description", result.description());
         assertEquals(projectId, result.projectId());
@@ -140,13 +133,12 @@ class VacancyServiceTest {
 
     @Test
     void updateVacancy_shouldThrowExceptionIfVacancyNotFound() {
-        // Arrange
+
         Long vacancyId = 1L;
         VacancyDto request = new VacancyDto("Updated Vacancy", "Updated Description", 1L);
 
         Mockito.when(vacancyRepository.findById(vacancyId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(VacancyNotFoundException.class, () -> vacancyService.updateVacancy(vacancyId, request));
 
         Mockito.verify(vacancyRepository).findById(vacancyId);
@@ -155,7 +147,7 @@ class VacancyServiceTest {
 
     @Test
     void updateVacancy_shouldThrowExceptionIfProjectNotFound() {
-        // Arrange
+
         Long vacancyId = 1L;
         Long projectId = 1L;
         Vacancy existingVacancy = new Vacancy(vacancyId, "Old Vacancy", "Old Description", null);
@@ -164,7 +156,7 @@ class VacancyServiceTest {
         Mockito.when(vacancyRepository.findById(vacancyId)).thenReturn(Optional.of(existingVacancy));
         Mockito.when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
-        // Act & Assert
+
         assertThrows(ProjectNotFoundException.class, () -> vacancyService.updateVacancy(vacancyId, request));
 
         Mockito.verify(vacancyRepository).findById(vacancyId);
@@ -174,27 +166,24 @@ class VacancyServiceTest {
 
     @Test
     void deleteVacancy_shouldDeleteWhenExists() {
-        // Arrange
+
         Long vacancyId = 1L;
 
         Mockito.when(vacancyRepository.existsById(vacancyId)).thenReturn(true);
 
-        // Act
         vacancyService.deleteVacancy(vacancyId);
 
-        // Assert
         Mockito.verify(vacancyRepository).existsById(vacancyId);
         Mockito.verify(vacancyRepository).deleteById(vacancyId);
     }
 
     @Test
     void deleteVacancy_shouldThrowExceptionIfNotFound() {
-        // Arrange
+
         Long vacancyId = 1L;
 
         Mockito.when(vacancyRepository.existsById(vacancyId)).thenReturn(false);
 
-        // Act & Assert
         assertThrows(VacancyNotFoundException.class, () -> vacancyService.deleteVacancy(vacancyId));
 
         Mockito.verify(vacancyRepository).existsById(vacancyId);

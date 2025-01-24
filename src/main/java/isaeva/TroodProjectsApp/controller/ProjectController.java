@@ -25,6 +25,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+
     /**
      * Retrieves a list of projects.
      *
@@ -42,7 +43,7 @@ public class ProjectController {
      *
      * @param id the ID of the project
      * @return a ResponseEntity containing the finding ProjectDto, with HTTP status 200 OK
-     *               or HTTP status 404 NOT FOUND if the project is not found
+     * or HTTP status 404 NOT FOUND if the project is not found
      */
 
     @GetMapping("/{id}")
@@ -67,14 +68,14 @@ public class ProjectController {
     /**
      * Updates an existing project.
      *
-     * @param id the ID of the project to update
+     * @param id      the ID of the project to update
      * @param request the request body containing the project data
      * @return a ResponseEntity containing the updated ProjectDto, with HTTP status 200 OK
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProjectDto> updateProject(@PathVariable Long id,
-                                                            @Valid @RequestBody ProjectDto request) {
-        ProjectDto updatedProject = projectService.updateProject(id,request);
+                                                    @Valid @RequestBody ProjectDto request) {
+        ProjectDto updatedProject = projectService.updateProject(id, request);
         log.info("The project was updated {}", request);
         return ResponseEntity.ok(updatedProject);
     }
